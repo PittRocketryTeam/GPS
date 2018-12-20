@@ -1,0 +1,320 @@
+Test number(s): 16-29
+
+Test description: flat range tests with fiberglass obstructing the antenna
+
+Data point #1
+Distance: 0.0 m, RSSI: -74
+Data point #2
+Distance: 3.2622083570600746 m, RSSI: -76
+Data point #3
+Distance: 6.377932102788297 m, RSSI: -81
+Data point #4
+Distance: 9.006723155204643 m, RSSI: -82
+Data point #5
+Distance: 11.865615694179862 m, RSSI: -87
+Data point #6
+Distance: 14.447365738668552 m, RSSI: -88
+Data point #7
+Distance: 16.795724600372004 m, RSSI: -89
+Data point #8
+Distance: 18.978762793180923 m, RSSI: -88
+Data point #9
+Distance: 21.37946577042473 m, RSSI: -90
+Data point #10
+Distance: 24.000345845692596 m, RSSI: -92
+Data point #11
+Distance: 26.991776654254082 m, RSSI: -91
+Data point #12
+Distance: 30.154869746250423 m, RSSI: -94
+Data point #13
+Distance: 32.79237145993029 m, RSSI: -96
+Data point #14
+Distance: 35.033546753354244 m, RSSI: -106
+Data point #15
+Distance: 36.65284967865162 m, RSSI: -106
+Data point #16
+Distance: 38.243569446228264 m, RSSI: -102
+Data point #17
+Distance: 39.85383512555603 m, RSSI: -105
+Data point #18
+Distance: 42.068747246849725 m, RSSI: -108
+Data point #19
+Distance: 49.57894507640508 m, RSSI: -97
+Data point #20
+Distance: 49.06301532253222 m, RSSI: -101
+Data point #21
+Distance: 49.073759632056664 m, RSSI: -100
+Data point #22
+Distance: 49.269633184842824 m, RSSI: -95
+Data point #23
+Distance: 49.65052017537682 m, RSSI: -102
+Data point #24
+Distance: 51.87849651522843 m, RSSI: -95
+Data point #25
+Distance: 57.031644486268625 m, RSSI: -108
+Data point #26
+Distance: 59.2906833156265 m, RSSI: -109
+Data point #27
+Distance: 61.160189764317664 m, RSSI: -94
+Data point #28
+Distance: 62.98705741355429 m, RSSI: -102
+Data point #29
+Distance: 65.19582202938159 m, RSSI: -104
+Data point #30
+Distance: 66.84222845302483 m, RSSI: -107
+Data point #31
+Distance: 68.70064076754711 m, RSSI: -93
+Data point #32
+Distance: 74.25879248232651 m, RSSI: -104
+Data point #33
+Distance: 83.85989233748467 m, RSSI: -108
+Data point #34
+Distance: 83.27969812565554 m, RSSI: -110
+Data point #35
+Distance: 83.09452675666776 m, RSSI: -105
+Data point #36
+Distance: 82.90371695014495 m, RSSI: -112
+Data point #37
+Distance: 83.26870857897005 m, RSSI: -109
+Data point #38
+Distance: 83.62911126498157 m, RSSI: -109
+Data point #39
+Distance: 83.80970219210543 m, RSSI: -108
+Data point #40
+Distance: 84.00440610405994 m, RSSI: -108
+Data point #41
+Distance: 84.009497719809 m, RSSI: -110
+Data point #42
+Distance: 83.83521630462876 m, RSSI: -97
+Data point #43
+Distance: 84.20556510428476 m, RSSI: -98
+Data point #44
+Distance: 84.57591654150602 m, RSSI: -98
+Data point #45
+Distance: 84.94076668758935 m, RSSI: -97
+Data point #46
+Distance: 85.12069809183934 m, RSSI: -95
+Data point #47
+Distance: 86.40296353189693 m, RSSI: -96
+Data point #48
+Distance: 87.86946678240865 m, RSSI: -106
+Data point #49
+Distance: 89.91089254383569 m, RSSI: -105
+Data point #50
+Distance: 98.42732013461578 m, RSSI: -108
+Data point #51
+Distance: 98.23676737440294 m, RSSI: -112
+Data point #52
+Distance: 98.4220647944518 m, RSSI: -111
+Data point #53
+Distance: 98.23929878103675 m, RSSI: -106
+Data point #54
+Distance: 109.19279811078634 m, RSSI: -108
+Data point #55
+Distance: 108.99740570522252 m, RSSI: -109
+Data point #56
+Distance: 109.19279811078634 m, RSSI: -104
+Data point #57
+Distance: 109.01127648047377 m, RSSI: -106
+Data point #58
+Distance: 109.20045004106656 m, RSSI: -109
+Data point #59
+Distance: 109.39406608656105 m, RSSI: -107
+Data point #60
+Distance: 109.58375030970885 m, RSSI: -105
+Data point #61
+Distance: 110.86385244078924 m, RSSI: -103
+Data point #62
+Distance: 112.7001231376575 m, RSSI: -96
+Data point #63
+Distance: 114.7330934982709 m, RSSI: -103
+Data point #64
+Distance: 116.77137046833082 m, RSSI: -105
+Data point #65
+Distance: 121.75852637175623 m, RSSI: -109
+Data point #66
+Distance: 121.57344707960982 m, RSSI: -111
+Data point #67
+Distance: 121.57344707960982 m, RSSI: -110
+Data point #68
+Distance: 124.17567891594288 m, RSSI: -111
+Data point #69
+Distance: 123.79733973302014 m, RSSI: -112
+Data point #70
+Distance: 123.61241769196789 m, RSSI: -113
+Data point #71
+Distance: 123.79774148503957 m, RSSI: -112
+Data point #72
+Distance: 123.98242343914201 m, RSSI: -112
+Data point #73
+Distance: 129.91304556839796 m, RSSI: -108
+Data point #74
+Distance: 129.91304556839796 m, RSSI: -109
+Data point #75
+Distance: 129.91304556839796 m, RSSI: -109
+Data point #76
+Distance: 129.91304556839796 m, RSSI: -105
+Data point #77
+Distance: 129.91304556839796 m, RSSI: -109
+Data point #78
+Distance: 129.91304556839796 m, RSSI: -107
+Data point #79
+Distance: 129.91304556839796 m, RSSI: -106
+Data point #80
+Distance: 129.91304556839796 m, RSSI: -105
+Data point #81
+Distance: 129.91304556839796 m, RSSI: -109
+Data point #82
+Distance: 130.09875230315004 m, RSSI: -108
+Data point #83
+Distance: 130.28407620235404 m, RSSI: -105
+Data point #84
+Distance: 131.02658650625074 m, RSSI: -98
+Data point #85
+Distance: 132.1414556249969 m, RSSI: -103
+Data point #86
+Distance: 141.4208892025953 m, RSSI: -97
+Data point #87
+Distance: 142.17217021296435 m, RSSI: -97
+Data point #88
+Distance: 142.73388991676057 m, RSSI: -97
+Data point #89
+Distance: 142.9223030100855 m, RSSI: -97
+Data point #90
+Distance: 143.11084705248626 m, RSSI: -104
+Data point #91
+Distance: 144.21924592624205 m, RSSI: -97
+Data point #92
+Distance: 148.46693636236506 m, RSSI: -99
+Data point #93
+Distance: 149.94082939153697 m, RSSI: -109
+Data point #94
+Distance: 151.9811266811581 m, RSSI: -113
+Data point #95
+Distance: 153.0848469492929 m, RSSI: -110
+Data point #96
+Distance: 158.82567489320743 m, RSSI: -106
+Data point #97
+Distance: 162.34483798710176 m, RSSI: -107
+Data point #98
+Distance: 162.34514434490657 m, RSSI: -109
+Data point #99
+Distance: 162.71548718414266 m, RSSI: -111
+Data point #100
+Distance: 164.0125168006382 m, RSSI: -112
+Data point #101
+Distance: 164.38322706780667 m, RSSI: -111
+Data point #102
+Distance: 164.75387668700526 m, RSSI: -108
+Data point #103
+Distance: 165.12452630681506 m, RSSI: -110
+Data point #104
+Distance: 165.12446606664662 m, RSSI: -107
+Data point #105
+Distance: 165.12446606664662 m, RSSI: -106
+Data point #106
+Distance: 159.76224845172732 m, RSSI: -105
+Data point #107
+Distance: 158.4831514606914 m, RSSI: -108
+Data point #108
+Distance: 158.30672207526055 m, RSSI: -112
+Data point #109
+Distance: 158.69451830352875 m, RSSI: -110
+Data point #110
+Distance: 158.90913777731 m, RSSI: -109
+Data point #111
+Distance: 158.5582629225701 m, RSSI: -110
+Data point #112
+Distance: 158.20949021081046 m, RSSI: -109
+Data point #113
+Distance: 157.8448743418366 m, RSSI: -105
+Data point #114
+Distance: 157.6776866036971 m, RSSI: -110
+Data point #115
+Distance: 157.6903031504515 m, RSSI: -108
+Data point #116
+Distance: 157.51830698658082 m, RSSI: -99
+Data point #117
+Distance: 157.15484858492638 m, RSSI: -105
+Data point #118
+Distance: 157.18320225001003 m, RSSI: -106
+Data point #119
+Distance: 157.58365274025124 m, RSSI: -105
+Data point #120
+Distance: 158.1627372114001 m, RSSI: -105
+Data point #121
+Distance: 158.54932899512733 m, RSSI: -108
+Data point #122
+Distance: 159.18476096474294 m, RSSI: -105
+Data point #123
+Distance: 157.70555903652445 m, RSSI: -109
+Data point #124
+Distance: 154.74735023796038 m, RSSI: -111
+Data point #125
+Distance: 128.51453193386746 m, RSSI: -110
+Data point #126
+Distance: 124.71155782613037 m, RSSI: -108
+Data point #127
+Distance: 121.44250429116595 m, RSSI: -108
+Data point #128
+Distance: 117.22028538376114 m, RSSI: -107
+Data point #129
+Distance: 100.63298983222266 m, RSSI: -104
+Data point #130
+Distance: 89.19807136297962 m, RSSI: -102
+Data point #131
+Distance: 87.72582928110548 m, RSSI: -106
+Data point #132
+Distance: 83.88060152672662 m, RSSI: -107
+Data point #133
+Distance: 80.0591388516266 m, RSSI: -107
+Data point #134
+Distance: 70.82610847964136 m, RSSI: -96
+Data point #135
+Distance: 67.52847243130766 m, RSSI: -96
+Data point #136
+Distance: 64.02909461195289 m, RSSI: -96
+Data point #137
+Distance: 60.1672091084689 m, RSSI: -97
+Data point #138
+Distance: 56.83232313417485 m, RSSI: -98
+Data point #139
+Distance: 52.95217155303475 m, RSSI: -105
+Data point #140
+Distance: 48.71162046951053 m, RSSI: -104
+Data point #141
+Distance: 44.05731850511108 m, RSSI: -104
+Data point #142
+Distance: 40.2199377716126 m, RSSI: -93
+Data point #143
+Distance: 36.46129602134349 m, RSSI: -95
+Data point #144
+Distance: 32.73440355598408 m, RSSI: -91
+Data point #145
+Distance: 28.083078282719512 m, RSSI: -96
+Data point #146
+Distance: 24.465731133588893 m, RSSI: -93
+Data point #147
+Distance: 20.327632989816497 m, RSSI: -88
+Data point #148
+Distance: 16.240605843332503 m, RSSI: -82
+Data point #149
+Distance: 12.967189268074456 m, RSSI: -81
+Data point #150
+Distance: 9.691244837506302 m, RSSI: -73
+Data point #151
+Distance: 5.963389754695421 m, RSSI: -68
+Data point #152
+Distance: 2.330030605533878 m, RSSI: -64
+Data point #153
+Distance: 0.6234473212352363 m, RSSI: -64
+Data point #154
+Distance: 0.28209710414869865 m, RSSI: -61
+Data point #155
+Distance: 0.4657896762593445 m, RSSI: -72
+Data point #156
+Distance: 0.8535673557771567 m, RSSI: -66
+Data point #157
+Distance: 0.5625242199164144 m, RSSI: -64
+Data point #158
+Distance: 0.7291863117262553 m, RSSI: -63

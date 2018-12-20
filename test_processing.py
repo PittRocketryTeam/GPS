@@ -1,61 +1,65 @@
 #*** USING Python 3.6.6 ***
 # for Python 2 input() = raw_input()
+# This script assumes that the static receiver latitude and longitude are stored at
+# the stop of the logfile in the following format:
+# 	Latitude: 39.9925
+# 	Longitude: -75.1415
 
 import math
-import Haversine
+import sys
+from Haversine import Haversine
 
 def main():
-	tx_lat = 0
-	tx_long = 0
-	tx_alt = 0
 	data_points = 0
-	dist = 0
 
-	filename = input("Enter the filename: ")
-	fix = input("Care about fix (y/n)? ")
+	logname = sys.argv[1]
+	outputFile = open(logname + "_processed", "x")
 
-	# Read GPS data from user about receiver location
-	rx_lat  = input("Enter receiver latitude (in DD): ")
-	rx_long = input("Enter receiver longitude (in DD): ")
-	# rx_alt  = input("Enter receiver altitude: ")
+	inputFile = open(logname, "r")
+	for line in inputFile:
+		if (line.startswith("Test")):
+			outputFile.write(line + "\n")
 
-	file = open(filename, "r")
-	for line in file:
+
+		# Read in data point
 		if line.startswith('Got'):
 			data = line.split(',')
 
 			# Exit if GPS didn't get a fix
-			if (data[6] != 1) & (fix == "y"):
+			if (not hasFix(data)):
 				print("Error: no fix")
 				quit()
 			
-			# Read GPS data about transceiver location
-			# tx_lat  = data[1] + data[2] #includes cardinal direction
-			# tx_long = data[3] + data[4] #includes cardinal direction
+			# Read transmitter GPS coordinates
 			tx_lat = data[2]
 			tx_long = data[4]
 			tx_alt  = data[8]
 			
 			#convert cordinates from DMS to DD
 			[tx_lat,tx_long]=to_DD(tx_lat,tx_long)
-			# print("lat is "+str(tx_lat)+" long is "+str(tx_long)) #remove comment to display dec degree cordinates
+
+			# Use first coordinates as starting coordinates
+			if (data_points == 0):
+				rx_lat = tx_lat
+				rx_long = tx_long
 
 			dist = calcDist(rx_lat, rx_long, tx_lat, tx_long)
 
 		if line.startswith('RSSI'):
 			data_points += 1
-			print("Data point #" + str(data_points))
-			print ("Distance: " + str(dist) + ", " + line)
+			outputFile.write("Data point #" + str(data_points))
+			outputFile.write("\nDistance: " + str(dist) + " m, " + line)
 
-	input("pause")
+def hasFix(data):
+	return (data[2] and data[4] and data[8])
+
 
 # Calculate distance	
 def calcDist(rx_lat, rx_long, tx_lat, tx_long):
+
 	# TODO: perform distance calculation
-	
-
-
-	return -1
+	dist = Haversine([rx_long, rx_lat], [tx_long, tx_lat])
+	return dist.meters
 
 #Convert from dms to decimal degrees
 def to_DD(latitude,longitude):

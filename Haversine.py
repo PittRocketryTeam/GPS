@@ -21,8 +21,8 @@ class Haversine:
         lon2,lat2=coord2
         
         R=6371000                               # radius of Earth in meters
-        phi_1=math.radians(lat1)
-        phi_2=math.radians(lat2)
+        phi_1=math.radians(float(lat1))
+        phi_2=math.radians(float(lat2))
 
         delta_phi=math.radians(lat2-lat1)
         delta_lambda=math.radians(lon2-lon1)
@@ -36,6 +36,7 @@ class Haversine:
         self.km=self.meters/1000.0              # output distance in kilometers
         self.miles=self.meters*0.000621371      # output distance in miles
         self.feet=self.miles*5280               # output distance in feet
+
 
 if __name__ == "__Haversine__":
     main()
