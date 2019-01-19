@@ -1,0 +1,75 @@
+n..
+Got reply: And hello back to you
+RSSI: -31
+.5944,N,07957.5757,W,1,07,1.76,274.2,M,-3$GPGGA,234712.000,
+Waiting for reply...
+Got reply: And hello back to you
+RSSI: -31
+.5944,N,07957.5757,W,1,07,1.76,274.2,M,-3$GPGGA,234712.000,
+Waiting for reply...
+Got reply: And hello back to you
+RSSI: -31
+LoRa radio init OK!
+Set Freq to: 433.00
+none
+PACKET: $GPGGA,234717.000,4026.5945,N,07957.5758,W,1,07,1.76,274.2,M,-3$GPGGA,234718.000,
+Waiting for reply...
+Got reply: And hello back to you
+RSSI: -30
+none
+PACKET: $GPGGA,234720.000,4026.5945,N,07957.5758,W,1,07,1.76,274.3,M,-3$GPGGA,234721.000,
+Waiting for reply...
+Got reply: And hello back to you
+RSSI: -31
+none
+PACKET: $GPGGA,234723.000,4026.5945,N,07957.5758,W,1,07,1.76,274.4,M,-3$GPGGA,234724.000,
+Waiting for reply...
+Got reply: And hello back to you
+RSSI: -31
+none
+PACKET: $GPGGA,234726.000,4026.5946,N,07957.5759,W,1,07,1.76,274.5,M,-3$GPGGA,234727.000,
+Waiting for reply...
+Got reply: And hello back to you
+RSSI: -32
+none
+PACKET: $GPGGA,234729.000,4026.5948,N,07957.5760,W,1,07,1.76,274.8,M,-3$GPGGA,234730.000,
+Waiting for reply...
+Got reply: And hello back to you
+RSSI: -39
+none
+PACKET: $GPGGA,234732.000,4026.5947,N,07957.5755,W,1,07,1.76,275.9,M,-3$GPGGA,234733.000,
+Waiting for reply...
+Got reply: And hello back to you
+RSSI: -28
+none
+PACKET: $GPGGA,234735.000,4026.5948,N,07957.5756,W,1,07,1.76,276.1,M,-3$GPGGA,234736.000,
+Waiting for reply...
+Got reply: And hello back to you
+RSSI: -38
+none
+PACKET: $GPGGA,234738.000,4026.5949,N,07957.5756,W,1,07,1.76,276.2,M,-3$GPGGA,234739.000,
+Waiting for reply...
+Got reply: And hello back to you
+RSSI: -47
+none
+PACKET: $GPGGA,234741.000,4026.5951,N,07957.5756,W,1,07,1.76,276.5,M,-3$GPGGA,234742.000,
+Waiting for reply...
+Got reply: And hello back to you
+RSSI: -51
+none
+PACKET: $GPGGA,234744.000,4026.5952,N,07957.5755,W,1,07,1.76,276.7,M,-3$GPGGA,234745.000,
+Waiting for reply...
+Got reply: And hello back to you
+RSSI: -51
+none
+PACKET: $GPGGA,234747.000,4026.5955,N,07957.5753,W,1,07,1.77,277.0,M,-3$GPGGA,234748.000,
+Waiting for reply...
+Got reply: And hello back to you
+RSSI: -48
+none
+PACKET: $GPGGA,234750.000,4026.5957,N,07957.5751,W,1,07,1.77,277.3,M,-3$GPGGA,234751.000,
+Test number(s): 1231
+Test description: 23423
+Latitude: 40.4432
+Longitude: -79.9531
+
