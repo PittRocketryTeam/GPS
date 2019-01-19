@@ -36,6 +36,7 @@ import time
 import geocoder
 import signal
 import threading
+import subprocess
 
 def main():
 
@@ -80,32 +81,33 @@ def main():
 	# Run command to start logging serial data to file
 	cmd = 'cat /dev/' + usb_port + ' > ' + path
 	print(cmd)
-	pid = os.spawnl(os.P_NOWAIT, cmd)
-	print(pid)
+	# pid = os.spawnl(os.P_NOWAIT, cmd)
+	# print(pid)
+	os.system(cmd)
 
 	# Once setup is complete, wait on blocking raw_input call until user enters obstruction
-	while 1:
+	# while 1:
 
-		# Read in obstruction -- stop if user enters 'exit'
-		write_out = raw_input("Obstruction: ")
-		if write_out == "exit":
-			print("Stopped logging, log: " + path)
-			# Kill cat process from pid
-			os.kill(pid, signal.SIGTERM)
-			exit(0)
+	# 	# # Read in obstruction -- stop if user enters 'exit'
+	# 	# write_out = raw_input("Obstruction: ")
+	# 	# if write_out == "exit":
+	# 	# 	print("Stopped logging, log: " + path)
+	# 	# 	# Kill cat process from pid
+	# 	# 	os.kill(pid, signal.SIGTERM)
+	# 	# 	exit(0)
 			
-		# Lock file
-		fcntl.flock(file, fcntl.LOCK_EX | fcntl.LOCK_NB)
+	# 	# # Lock file
+	# 	# fcntl.flock(file, fcntl.LOCK_EX | fcntl.LOCK_NB)
 
-		# Write timestamp and obstruction to file
-		st = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
-		file.write(str(st) + " obstruction: " + write_out + "\n")
+	# 	# # Write timestamp and obstruction to file
+	# 	# st = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+	# 	# file.write(str(st) + " obstruction: " + write_out + "\n")
 
-		# Flush file buffer
-		file.flush()
+	# 	# # Flush file buffer
+	# 	# file.flush()
 
-		# Unlock file
-		fcntl.flock(file, fcntl.LOCK_UN)
+	# 	# # Unlock file
+	# 	# fcntl.flock(file, fcntl.LOCK_UN)
 
 
 
