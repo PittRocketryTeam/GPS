@@ -17,9 +17,9 @@ def main():
 	data_points = []
 
 	logname = sys.argv[1]
-	outputFile = open(logname + "_processed", "w")
+	outputFile = open("./logs/processed/" + logname + "_processed", "w")
 
-	inputFile = open(logname, "r")
+	inputFile = open("./logs/" + logname, "r")
 	for line in inputFile:
 		if (line.startswith("Test")):
 			outputFile.write(line + "\n")
