@@ -130,40 +130,44 @@ void loop()
       uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
       uint8_t len = sizeof(buf);
       Serial.println("Waiting for reply..."); delay(10);
+      digitalWrite(RED, HIGH);
+      digitalWrite(GREEN, LOW);
       if (rf95.waitAvailableTimeout(1000))
       { 
         // Should be a reply message for us now   
         if (rf95.recv(buf, &len))
         {
-          blinkLed(GREEN, 2, 200);
+          Serial.println("");
+          Serial.println("<---------- BEGIN TRANSMISSION ---------->");
+          digitalWrite(GREEN, HIGH);
+          digitalWrite(RED, LOW);
           Serial.print("Got reply: ");
           Serial.println((char*)buf);
           String str((char*)buf);
-          if (str.startsWith("CMD")) {
-            
+          if (str.startsWith("CMD"))
+          {
+            Serial.println("PACKET CONTAINS A COMMAND");
           }
           Serial.print("RSSI: ");
-          Serial.println(rf95.lastRssi(), DEC);    
+          Serial.println(rf95.lastRssi());    
+          Serial.println("<----------  END TRANSMISSION  ---------->");
         }
         else
         {
-          Serial.println("Receive failed");
-          blinkLed(RED, 2, 1000);
+          Serial.println("FATAL: RECEIVE FAILED");
         }
       }
       else
       {
         Serial.println("No reply, is there a listener around?");
-        blinkLed(RED, 2, 200);
       }
     } 
     else 
     {
       Serial.println("none");
-      blinkLed(RED, 2, 100);
     }
 
-    delay(1000); // breathing room
+    //delay(1000); // breathing room
     gpsBuffer = ""; // clear gps buffer
     transmitReady = false; // read more gps data
   }

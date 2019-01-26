@@ -104,7 +104,38 @@ void setup()
 
 void loop()
 { 
-  Serial.println("Sending to rf95_server");
+  uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
+  uint8_t len = sizeof(buf);
+  while (!rf95.available())
+  {
+    digitalWrite(RED, HIGH);
+    digitalWrite(GREEN, LOW);
+  }
+  if (rf95.recv(buf, &len))
+  {
+    Serial.println("");
+    Serial.println("<---------- BEGIN TRANSMISSION ---------->");
+    digitalWrite(RED, LOW);
+    digitalWrite(GREEN, HIGH);
+    Serial.print("GOT REPLY: ");
+    Serial.println((char*)buf);
+
+    char packet[20] = "CMD other stuff";
+    packet[19] = '\0';
+    rf95.send((uint8_t*)packet, 10);
+
+    String str((char*)buf);
+    if (str.startsWith("$GPGGA"))
+    {
+      Serial.println("PACKET CONTAINS NMEA DATA");
+    }
+    Serial.print("RSSI: ");
+    Serial.println(rf95.lastRssi());
+    Serial.println("<----------  END TRANSMISSION  ---------->");
+    delay(100);
+  }
+  
+  /*Serial.println("Sending to rf95_server");
   // Send a message to rf95_server
   
   char radiopacket[20] = "CMD other stuff    ";
@@ -148,5 +179,5 @@ void loop()
     Serial.println("No reply, is there a listener around?");
     blinkLed(RED, 2, 200);
   }
-  delay(1000);
+  delay(1000);*/
 }
