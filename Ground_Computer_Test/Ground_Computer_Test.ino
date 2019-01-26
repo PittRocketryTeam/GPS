@@ -120,19 +120,23 @@ void loop()
     Serial.print("GOT REPLY: ");
     Serial.println((char*)buf);
 
-    char packet[20] = "CMD other stuff";
-    packet[19] = '\0';
-    rf95.send((uint8_t*)packet, 10);
-
     String str((char*)buf);
     if (str.startsWith("$GPGGA"))
     {
       Serial.println("PACKET CONTAINS NMEA DATA");
     }
+
+    char packet[20] = "CMD other stuff";
+    packet[19] = '\0';
+    Serial.print("SENDING PACKET... ");
+    rf95.send((uint8_t*)packet, 20);
+    rf95.waitPacketSent();
+    Serial.println("DONE!");
+    
     Serial.print("RSSI: ");
     Serial.println(rf95.lastRssi());
     Serial.println("<----------  END TRANSMISSION  ---------->");
-    delay(100);
+    //delay(100);
   }
   
   /*Serial.println("Sending to rf95_server");
@@ -180,4 +184,5 @@ void loop()
     blinkLed(RED, 2, 200);
   }
   delay(1000);*/
+  delay(1000);
 }

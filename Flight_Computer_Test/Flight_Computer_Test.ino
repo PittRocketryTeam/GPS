@@ -167,7 +167,7 @@ void loop()
       Serial.println("none");
     }
 
-    //delay(1000); // breathing room
+    delay(1000); // breathing room
     gpsBuffer = ""; // clear gps buffer
     transmitReady = false; // read more gps data
   }
