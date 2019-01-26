@@ -47,9 +47,11 @@ void blinkLed(int pin, int blinks, int duration)
  
 void setup() 
 {
+  // setup led pins
   pinMode(GREEN, OUTPUT);
   pinMode(RED, OUTPUT);
 
+  // status leds on
   digitalWrite(GREEN, HIGH);
   digitalWrite(RED, HIGH);
   
@@ -57,22 +59,21 @@ void setup()
   pinMode(RFM95_RST, OUTPUT);
   digitalWrite(RFM95_RST, HIGH);
   
-  // wait for serial
-  //while (!Serial);
-  Serial.begin(9600); // start serial
+  // start serial
+  Serial.begin(9600);
   delay(100);
 
+  // start gps
   GPS.begin(9600); // start gps
   delay(100);
  
-  // manual reset
+  // manual reset LoRa
   digitalWrite(RFM95_RST, LOW);
   delay(10);
   digitalWrite(RFM95_RST, HIGH);
   delay(10);
 
   // init and check radio systems
-
   while (!rf95.init()) 
   {
     Serial.println("LoRa radio init failed");
@@ -94,6 +95,7 @@ void setup()
   gpsBuffer.reserve(82); // allocate memory
   GPS.listen(); // start listening
 
+  // status leds off
   digitalWrite(GREEN, LOW);
   digitalWrite(RED, LOW);
 }
@@ -133,7 +135,7 @@ void loop()
         // Should be a reply message for us now   
         if (rf95.recv(buf, &len))
         {
-          blinkLed(GREEN, 3, 100);
+          blinkLed(GREEN, 2, 200);
           Serial.print("Got reply: ");
           Serial.println((char*)buf);
           String str((char*)buf);
@@ -146,18 +148,19 @@ void loop()
         else
         {
           Serial.println("Receive failed");
-          blinkLed(RED, 2, 300);
+          blinkLed(RED, 2, 1000);
         }
       }
       else
       {
         Serial.println("No reply, is there a listener around?");
-        blinkLed(RED, 3, 100);
+        blinkLed(RED, 2, 200);
       }
     } 
     else 
     {
       Serial.println("none");
+      blinkLed(RED, 2, 100);
     }
 
     delay(1000); // breathing room

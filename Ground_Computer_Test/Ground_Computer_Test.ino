@@ -26,7 +26,7 @@ RH_RF95 rf95(RFM95_CS, RFM95_INT);
 // blink our pretty test led
 void testBlink(int n, int d)
 {
-  if (n <=0) return;
+  if (n <= 0) return;
   if (d <= 0) return;
 
   for (int i=0; i<n; i++)
@@ -126,7 +126,7 @@ void loop()
     // Should be a reply message for us now   
     if (rf95.recv(buf, &len))
     {
-      blinkLed(GREEN, 3, 100);
+      blinkLed(GREEN, 2, 200);
       Serial.print("Got reply: ");
       Serial.println((char*)buf);
       String str((char*)buf);
@@ -139,14 +139,14 @@ void loop()
     else
     {
       Serial.println("Receive failed");
-      blinkLed(RED, 2, 300);
+      blinkLed(RED, 2, 1000);
       
     }
   }
   else
   {
     Serial.println("No reply, is there a listener around?");
-    blinkLed(RED, 3, 100);
+    blinkLed(RED, 2, 200);
   }
   delay(1000);
 }
