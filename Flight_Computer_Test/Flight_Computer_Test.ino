@@ -58,7 +58,7 @@ void setup()
   digitalWrite(RFM95_RST, HIGH);
   
   // wait for serial
-  while (!Serial);
+  //while (!Serial);
   Serial.begin(9600); // start serial
   delay(100);
 
