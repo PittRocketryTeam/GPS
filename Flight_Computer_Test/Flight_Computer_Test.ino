@@ -19,6 +19,9 @@
 // radio driver
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
+#define GREEN 24
+#define RED 25
+
 #define PACKET_SIZE 82
 char packet[PACKET_SIZE];
 String gpsBuffer;
@@ -28,30 +31,32 @@ bool transmitReady;
 // gps serial
 SoftwareSerial GPS(GPS_TX, GPS_RX);
 
-// blink our pretty test led
-void testBlink(int n, int d)
+void blinkLed(int pin, int blinks, int duration)
 {
-  if (n <=0) return;
-  if (d <= 0) return;
+  if (blinks <= 0) return;
+  if (duration <= 0) return;
 
-  for (int i=0; i<n; i++)
+  for (int i=0; i<blinks; i++)
   {
-    digitalWrite(TLED, HIGH);
-    delay(d);
-    digitalWrite(TLED, LOW);
-    delay(d);
+    digitalWrite(pin, HIGH);
+    delay(duration);
+    digitalWrite(pin, LOW);
+    delay(duration);
   }
 }
  
 void setup() 
 {
+  pinMode(GREEN, OUTPUT);
+  pinMode(RED, OUTPUT);
+
+  digitalWrite(GREEN, HIGH);
+  digitalWrite(RED, HIGH);
+  
   // initialize pins
   pinMode(RFM95_RST, OUTPUT);
   digitalWrite(RFM95_RST, HIGH);
-
-  pinMode(TLED, OUTPUT);
-  testBlink(1, 500);
- 
+  
   // wait for serial
   while (!Serial);
   Serial.begin(9600); // start serial
@@ -88,6 +93,9 @@ void setup()
   transmitReady = false;
   gpsBuffer.reserve(82); // allocate memory
   GPS.listen(); // start listening
+
+  digitalWrite(GREEN, LOW);
+  digitalWrite(RED, LOW);
 }
 
 void loop()
@@ -125,11 +133,12 @@ void loop()
         // Should be a reply message for us now   
         if (rf95.recv(buf, &len))
         {
+          blinkLed(GREEN, 3, 100);
           Serial.print("Got reply: ");
           Serial.println((char*)buf);
           String str((char*)buf);
           if (str.startsWith("CMD")) {
-            testBlink(3, 80);
+            
           }
           Serial.print("RSSI: ");
           Serial.println(rf95.lastRssi(), DEC);    
@@ -137,11 +146,13 @@ void loop()
         else
         {
           Serial.println("Receive failed");
+          blinkLed(RED, 2, 300);
         }
       }
       else
       {
         Serial.println("No reply, is there a listener around?");
+        blinkLed(RED, 3, 100);
       }
     } 
     else 

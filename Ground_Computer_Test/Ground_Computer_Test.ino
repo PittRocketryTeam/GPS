@@ -14,6 +14,8 @@
 #define RFM95_INT 3
 
 #define TLED 8
+#define GREEN 24
+#define RED 25
 
 // Change to 434.0 or other frequency, must match RX's freq!
 #define RF95_FREQ 433.0
@@ -36,10 +38,27 @@ void testBlink(int n, int d)
   }
 }
 
+void blinkLed(int pin, int blinks, int duration)
+{
+  if (blinks <= 0) return;
+  if (duration <= 0) return;
+
+  for (int i=0; i<blinks; i++)
+  {
+    digitalWrite(pin, HIGH);
+    delay(duration);
+    digitalWrite(pin, LOW);
+    delay(duration);
+  }
+}
+
 void setup() 
 {
-  pinMode(TLED, OUTPUT);
-  testBlink(1, 500);
+  pinMode(GREEN, OUTPUT);
+  pinMode(RED, OUTPUT);
+
+  digitalWrite(GREEN, HIGH);
+  digitalWrite(RED, HIGH);
   
   pinMode(RFM95_RST, OUTPUT);
   digitalWrite(RFM95_RST, HIGH);
@@ -78,10 +97,13 @@ void setup()
   // If you are using RFM95/96/97/98 modules which uses the PA_BOOST transmitter pin, then 
   // you can set transmitter powers from 5 to 23 dBm:
   rf95.setTxPower(23, false);
+
+  digitalWrite(GREEN, LOW);
+  digitalWrite(RED, LOW);
 }
 
 void loop()
-{
+{ 
   Serial.println("Sending to rf95_server");
   // Send a message to rf95_server
   
@@ -103,12 +125,13 @@ void loop()
   { 
     // Should be a reply message for us now   
     if (rf95.recv(buf, &len))
-   {
+    {
+      blinkLed(GREEN, 3, 100);
       Serial.print("Got reply: ");
       Serial.println((char*)buf);
       String str((char*)buf);
       if (str.startsWith("$GPGGA")) {
-        testBlink(3, 80);
+        
       }
       Serial.print("RSSI: ");
       Serial.println(rf95.lastRssi(), DEC);    
@@ -116,11 +139,14 @@ void loop()
     else
     {
       Serial.println("Receive failed");
+      blinkLed(RED, 2, 300);
+      
     }
   }
   else
   {
     Serial.println("No reply, is there a listener around?");
+    blinkLed(RED, 3, 100);
   }
   delay(1000);
 }
