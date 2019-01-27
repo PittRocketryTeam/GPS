@@ -17,6 +17,9 @@
 #define GREEN 24
 #define RED 25
 
+char header[5] = "U_UP";
+char header2[4] = {'U', '_', 'U', 'P'};
+
 // Change to 434.0 or other frequency, must match RX's freq!
 #define RF95_FREQ 433.0
 
@@ -121,14 +124,30 @@ void loop()
     Serial.println((char*)buf);
 
     String str((char*)buf);
-    if (str.startsWith("$GPGGA"))
+
+    if (!str.substring(0,4).equals("HEYY"))
+    {
+      Serial.println("FATAL! BAD HEADER");
+      return; 
+    }
+    else
+    {
+      Serial.println("HEADER CONFIRMED");
+    }
+    
+    if (str.substring(4).startsWith("$GPGGA"))
     {
       Serial.println("PACKET CONTAINS NMEA DATA");
     }
 
-    char packet[20] = "CMD other stuff";
+    delay(500);
+    
+    char packet[20] = "";
+    strcat(packet, header);
+    strcat(packet, " CMD other stuff");
     packet[19] = '\0';
     Serial.print("SENDING PACKET... ");
+    //Serial.println((char*)packet);
     rf95.send((uint8_t*)packet, 20);
     rf95.waitPacketSent();
     Serial.println("DONE!");
@@ -136,7 +155,8 @@ void loop()
     Serial.print("RSSI: ");
     Serial.println(rf95.lastRssi());
     Serial.println("<----------  END TRANSMISSION  ---------->");
-    //delay(100);
+
+    delay(100);
   }
   
   /*Serial.println("Sending to rf95_server");
@@ -184,5 +204,5 @@ void loop()
     blinkLed(RED, 2, 200);
   }
   delay(1000);*/
-  delay(1000);
+  //delay(1000);
 }
