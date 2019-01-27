@@ -18,28 +18,11 @@
 #define RED 25
 
 char header[5] = "U_UP";
-char header2[4] = {'U', '_', 'U', 'P'};
 
-// Change to 434.0 or other frequency, must match RX's freq!
 #define RF95_FREQ 433.0
 
 // Singleton instance of the radio driver
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
-
-// blink our pretty test led
-void testBlink(int n, int d)
-{
-  if (n <= 0) return;
-  if (d <= 0) return;
-
-  for (int i=0; i<n; i++)
-  {
-    digitalWrite(TLED, HIGH);
-    delay(d);
-    digitalWrite(TLED, LOW);
-    delay(d);
-  }
-}
 
 void blinkLed(int pin, int blinks, int duration)
 {
@@ -55,62 +38,77 @@ void blinkLed(int pin, int blinks, int duration)
   }
 }
 
-void setup() 
+void setup()
 {
+  // Init debug LEDs
   pinMode(GREEN, OUTPUT);
   pinMode(RED, OUTPUT);
 
-  digitalWrite(GREEN, HIGH);
-  digitalWrite(RED, HIGH);
-  
-  pinMode(RFM95_RST, OUTPUT);
-  digitalWrite(RFM95_RST, HIGH);
-
-  // wait for serial
-  //while (!Serial);
+  // Start serial communications
   Serial.begin(9600);
   delay(100);
 
+  // Signal init start
+  digitalWrite(GREEN, HIGH);
+  digitalWrite(RED, HIGH);
+
+  // Init LoRa reset pin
+  pinMode(RFM95_RST, OUTPUT);
+  digitalWrite(RFM95_RST, HIGH);
+
   Serial.println("Arduino LoRa TX Test!");
 
-  // manual reset
+  // Manually reset the LoRa module
   digitalWrite(RFM95_RST, LOW);
   delay(10);
   digitalWrite(RFM95_RST, HIGH);
   delay(10);
 
-  while (!rf95.init()) 
+  // Wait for LoRa module to be ready
+  while (!rf95.init())
   {
     Serial.println("LoRa radio init failed");
-    while (1);
+    while (1); // hang
   }
   Serial.println("LoRa radio init OK!");
 
-  // Defaults after init are 434.0MHz, modulation GFSK_Rb250Fd250, +13dbM
-  if (!rf95.setFrequency(RF95_FREQ)) 
+  // Set frequency
+  // Defaults after init are 433.0MHz, modulation GFSK_Rb250Fd250, +13dbM
+  if (!rf95.setFrequency(RF95_FREQ))
   {
     Serial.println("setFrequency failed");
-    while (1);
+    while (1); // hang
   }
   Serial.print("Set Freq to: "); Serial.println(RF95_FREQ);
-  
+
   // Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on
 
   // The default transmitter power is 13dBm, using PA_BOOST.
-  // If you are using RFM95/96/97/98 modules which uses the PA_BOOST transmitter pin, then 
-  // you can set transmitter powers from 5 to 23 dBm:
+  // Set transmitter powers to 23 dBm:
   rf95.setTxPower(23, false);
 
+  // Indicate successful init
   digitalWrite(GREEN, LOW);
   digitalWrite(RED, LOW);
 }
 
 void loop()
-{ 
+{
+  /**
+   * Instead of redefining the buffers every cycle, I'd rather
+   * define the buffers once, and then call either
+   * memset(buf, 0, sizeof(buf)); or set the first index of the array
+   * to '\0' (null terminator)
+   * every cycle.
+   **/
+  // Define recv buffers
   uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
   uint8_t len = sizeof(buf);
+
+  // Wait for data from the flight computer
   while (!rf95.available())
   {
+    // signal no data received
     digitalWrite(RED, HIGH);
     digitalWrite(GREEN, LOW);
   }
@@ -118,54 +116,76 @@ void loop()
   {
     Serial.println("");
     Serial.println("<---------- BEGIN TRANSMISSION ---------->");
+    // Signal data received
     digitalWrite(RED, LOW);
     digitalWrite(GREEN, HIGH);
     Serial.print("GOT REPLY: ");
     Serial.println((char*)buf);
 
+    // convert recv buffer into Arduino String
     String str((char*)buf);
 
+    // Validate header
     if (!str.substring(0,4).equals("HEYY"))
     {
       Serial.println("FATAL! BAD HEADER");
-      return; 
+      // indicate bad header
+      digitalWrite(RED, HIGH);
+      digitalWrite(GREEN, HIGH);
+      delay(1000);
+      return; // break out of loop function
     }
     else
     {
       Serial.println("HEADER CONFIRMED");
     }
-    
+
+    // Validate NMEA sentence
     if (str.substring(4).startsWith("$GPGGA"))
     {
       Serial.println("PACKET CONTAINS NMEA DATA");
     }
 
-    delay(500);
-    
+    delay(500); // Breathing room for the flight computer
+
+    /**
+     * Instead of redefining the buffers every cycle, I'd rather
+     * define the buffers once, and then call either
+     * memset(packet, 0, sizeof(packet)); or set the first index of the array
+     * to '\0' (null terminator)
+     * every cycle.
+     **/
+
+    // Define response buffer
     char packet[20] = "";
-    strcat(packet, header);
-    strcat(packet, " CMD other stuff");
-    packet[19] = '\0';
+    strcat(packet, header); // Add header
+    strcat(packet, " CMD other stuff"); // Add dummy command
+    packet[19] = '\0'; // Null terminate
     Serial.print("SENDING PACKET... ");
     //Serial.println((char*)packet);
-    rf95.send((uint8_t*)packet, 20);
-    rf95.waitPacketSent();
+    rf95.send((uint8_t*)packet, 20); // TODO change the 20 to sizeof(packet)
+    rf95.waitPacketSent(); // Wait until finished sending
     Serial.println("DONE!");
-    
+
+    // Report RSSI
     Serial.print("RSSI: ");
     Serial.println(rf95.lastRssi());
     Serial.println("<----------  END TRANSMISSION  ---------->");
 
     delay(100);
   }
-  
+
+  /**
+   * Everything below is old code and should not be used
+   */
+
   /*Serial.println("Sending to rf95_server");
   // Send a message to rf95_server
-  
+
   char radiopacket[20] = "CMD other stuff    ";
   Serial.print("Sending "); Serial.println(radiopacket);
   radiopacket[19] = 0;
-  
+
   Serial.println("Sending..."); delay(10);
   rf95.send((uint8_t *)radiopacket, 20);
 
@@ -177,8 +197,8 @@ void loop()
 
   Serial.println("Waiting for reply..."); delay(10);
   if (rf95.waitAvailableTimeout(1000))
-  { 
-    // Should be a reply message for us now   
+  {
+    // Should be a reply message for us now
     if (rf95.recv(buf, &len))
     {
       blinkLed(GREEN, 2, 200);
@@ -186,16 +206,16 @@ void loop()
       Serial.println((char*)buf);
       String str((char*)buf);
       if (str.startsWith("$GPGGA")) {
-        
+
       }
       Serial.print("RSSI: ");
-      Serial.println(rf95.lastRssi(), DEC);    
+      Serial.println(rf95.lastRssi(), DEC);
     }
     else
     {
       Serial.println("Receive failed");
       blinkLed(RED, 2, 1000);
-      
+
     }
   }
   else
