@@ -15,15 +15,17 @@
 #define GPS_RX 8
  
 #define RF95_FREQ 433.0
- 
+
 // radio driver
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
 #define GREEN 24
 #define RED 25
 
-#define PACKET_SIZE 82
+#define PACKET_SIZE 86
 char packet[PACKET_SIZE];
+char VEHICLE_HEADER[4] = {'H','E','Y','Y'};
+String GS_HEADER = "U_UP";
 String gpsBuffer;
 char byteIn;
 bool transmitReady;
@@ -92,7 +94,7 @@ void setup()
   rf95.setTxPower(23, false);
 
   transmitReady = false;
-  gpsBuffer.reserve(82); // allocate memory
+  gpsBuffer.reserve(PACKET_SIZE - sizeof(VEHICLE_HEADER)); // allocate memory
   GPS.listen(); // start listening
 
   // status leds off
@@ -102,6 +104,7 @@ void setup()
 
 void loop()
 {
+  
   // GPS Reading
   while (GPS.available()) 
   {
@@ -118,9 +121,17 @@ void loop()
   {
     if (gpsBuffer.startsWith("$GPGGA")) // only transmit what's needed
     {
-      gpsBuffer.toCharArray(packet, PACKET_SIZE); // copy gps data to packet
+      char payload[PACKET_SIZE - sizeof(VEHICLE_HEADER)];
+      gpsBuffer.toCharArray(payload, PACKET_SIZE - sizeof(VEHICLE_HEADER)); // copy gps data to packet
       packet[PACKET_SIZE - 1] = 0; // null terminate the packet
-  
+      packet[0] = VEHICLE_HEADER[0];
+      packet[1] = VEHICLE_HEADER[1];
+      packet[2] = VEHICLE_HEADER[2];
+      packet[3] = VEHICLE_HEADER[3];
+      for (int i = sizeof(VEHICLE_HEADER); i < PACKET_SIZE; i++)
+        packet[i] = payload[i - sizeof(VEHICLE_HEADER)];
+      
+
       Serial.print("PACKET: ");
       Serial.println(packet);
       rf95.send((uint8_t*)packet, PACKET_SIZE); // cast pointer to unsigned character and send
@@ -130,41 +141,40 @@ void loop()
       uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
       uint8_t len = sizeof(buf);
       Serial.println("Waiting for reply..."); delay(10);
-      digitalWrite(RED, HIGH);
-      digitalWrite(GREEN, LOW);
       if (rf95.waitAvailableTimeout(1000))
       { 
         // Should be a reply message for us now   
         if (rf95.recv(buf, &len))
         {
-          Serial.println("");
-          Serial.println("<---------- BEGIN TRANSMISSION ---------->");
-          digitalWrite(GREEN, HIGH);
-          digitalWrite(RED, LOW);
-          Serial.print("Got reply: ");
-          Serial.println((char*)buf);
+          Serial.println("Received something, checking header...");
           String str((char*)buf);
-          if (str.startsWith("CMD"))
-          {
-            Serial.println("PACKET CONTAINS A COMMAND");
+          Serial.println(str.substring(0,4));
+          if (str.substring(0,4).equals(GS_HEADER)) {
+            // Message has valid header 
+            Serial.println("Valid header.");
+            Serial.print("Got reply: ");
+            Serial.println((char*)buf);
+            blinkLed(GREEN, 2, 200);
           }
           Serial.print("RSSI: ");
-          Serial.println(rf95.lastRssi());    
-          Serial.println("<----------  END TRANSMISSION  ---------->");
+          Serial.println(rf95.lastRssi(), DEC);    
         }
         else
         {
-          Serial.println("FATAL: RECEIVE FAILED");
+          Serial.println("Receive failed");
+          blinkLed(RED, 2, 1000);
         }
       }
       else
       {
         Serial.println("No reply, is there a listener around?");
+        blinkLed(RED, 2, 200); 
       }
     } 
     else 
     {
       Serial.println("none");
+      blinkLed(RED, 2, 100);
     }
 
     delay(1000); // breathing room
