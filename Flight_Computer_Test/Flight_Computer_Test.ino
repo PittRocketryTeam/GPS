@@ -121,6 +121,7 @@ void loop()
   {
     if (gpsBuffer.startsWith("$GPGGA")) // only transmit what's needed
     {
+      // Populate packet with header and GPS payload 
       char payload[PACKET_SIZE - sizeof(VEHICLE_HEADER)];
       gpsBuffer.toCharArray(payload, PACKET_SIZE - sizeof(VEHICLE_HEADER)); // copy gps data to packet
       packet[PACKET_SIZE - 1] = 0; // null terminate the packet
@@ -130,17 +131,21 @@ void loop()
       packet[3] = VEHICLE_HEADER[3];
       for (int i = sizeof(VEHICLE_HEADER); i < PACKET_SIZE; i++)
         packet[i] = payload[i - sizeof(VEHICLE_HEADER)];
-      
 
       Serial.print("PACKET: ");
       Serial.println(packet);
-      rf95.send((uint8_t*)packet, PACKET_SIZE); // cast pointer to unsigned character and send
-      rf95.waitPacketSent(); // wait for send to finish
+
+      // cast pointer to unsigned character and send
+      rf95.send((uint8_t*)packet, PACKET_SIZE); 
+
+      // wait for send to finish
+      rf95.waitPacketSent(); 
       
       // check for a response
       uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
       uint8_t len = sizeof(buf);
-      Serial.println("Waiting for reply..."); delay(10);
+      Serial.println("Waiting for reply..."); 
+      delay(10);
       if (rf95.waitAvailableTimeout(1000))
       { 
         // Should be a reply message for us now   
@@ -148,13 +153,17 @@ void loop()
         {
           Serial.println("Received something, checking header...");
           String str((char*)buf);
-          Serial.println(str.substring(0,4));
-          if (str.substring(0,4).equals(GS_HEADER)) {
-            // Message has valid header 
-            Serial.println("Valid header.");
-            Serial.print("Got reply: ");
+          
+          // Message has valid header 
+          if (str.substring(0,4).equals(GS_HEADER)) 
+          {
+            Serial.print("Valid header. Got reply: ");
             Serial.println((char*)buf);
             blinkLed(GREEN, 2, 200);
+          }
+          else
+          {
+            Serial.println("Error: Message has invalid header.");
           }
           Serial.print("RSSI: ");
           Serial.println(rf95.lastRssi(), DEC);    
@@ -173,7 +182,7 @@ void loop()
     } 
     else 
     {
-      Serial.println("none");
+      Serial.println("Error: GPS problem.");
       blinkLed(RED, 2, 100);
     }
 
