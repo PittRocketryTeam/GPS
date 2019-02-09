@@ -1,6 +1,13 @@
 #include <SPI.h>
 #include <RH_RF95.h>
 #include <SoftwareSerial.h>
+#include <TeensyID.h>
+
+
+// PCB UUID = 4e453614-8016-4000-8016-04e9e507f491
+// Prototype UUID = 4e453614-8016-4000-8020-04e9e507f41f
+
+const char* UUID = teensyUUID();
 
 // miso 12
 // mosi 11
@@ -74,6 +81,9 @@ void setup()
   delay(10);
   digitalWrite(RFM95_RST, HIGH);
   delay(10);
+
+  // Print UUID
+  Serial.println(UUID);
 
   // init and check radio systems
   while (!rf95.init()) 
