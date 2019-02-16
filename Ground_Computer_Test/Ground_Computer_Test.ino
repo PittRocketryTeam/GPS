@@ -1,21 +1,23 @@
-#include <SPI.h> // patrick - tentatively remove
+//#include <SPI.h> // patrick - tentatively remove // done
 #include <RH_RF95.h>
 
 #define RFM95_CS 4 // Change 'RFM95' to 'LoRa' - Rachel
 #define RFM95_RST 2
 #define RFM95_INT 3
 
-#define TLED 8    // remove -rachel
+//#define TLED 8    // remove -rachel // done
 #define GREEN 24
 #define RED 25
 
-char header[5] = "U_UP";  // make this constant -rachel
+#define PACKET_SIZE 20
+
+const char header[5] = "U_UP";  // make this constant -rachel // done
+const char flight_header[5] = "HEYY";
 // add define for flight header - rachel
 
-#define RF95_FREQ 433.0 // Change 'RFM95' to 'LoRa' - Rachel
+#define LORA_FREQ 433.0 // Change 'RFM95' to 'LoRa' - Rachel // done - patrick
 
-// Singleton instance of the radio driver
-RH_RF95 rf95(RFM95_CS, RFM95_INT); // Change 'RFM95' to 'LoRa' - Rachel
+RH_RF95 lora(RFM95_CS, RFM95_INT); // Change 'RFM95' to 'LoRa' - Rachel // done - patrick
 
 void blinkLed(int pin, int blinks, int duration)
 {
@@ -49,7 +51,7 @@ void setup()
   pinMode(RFM95_RST, OUTPUT);
   digitalWrite(RFM95_RST, HIGH);
 
-  Serial.println("Arduino LoRa TX Test!"); // go away -rachel
+  //Serial.println("Arduino LoRa TX Test!"); // go away -rachel // done - 
 
   // Manually reset the LoRa module
   digitalWrite(RFM95_RST, LOW);
@@ -58,27 +60,30 @@ void setup()
   delay(10);
 
   // Wait for LoRa module to be ready
-  while (!rf95.init())
+  while (!lora.init())
   {
     Serial.println("LoRa radio init failed");
-    while (1); // hang  // Add delay before trying to reinit -Rachel
+    //while (1); // hang  // Add delay before trying to reinit -Rachel
+    delay(100);
   }
   Serial.println("LoRa radio init OK!");
 
   // Set frequency
   // Defaults after init are 433.0MHz, modulation GFSK_Rb250Fd250, +13dbM
-  if (!rf95.setFrequency(RF95_FREQ)) // make this a while loop -rachel
+  //if (!lora.setFrequency(LORA_FREQ)) // make this a while loop -rachel
+  while (!lora.setFrequency(LORA_FREQ))
   {
     Serial.println("setFrequency failed");
-    while (1); // hang  // Add delay before trying to reinit -Rachel
+    //while (1); // hang  // Add delay before trying to reinit -Rachel
+    delay(1000);
   }
-  Serial.print("Set Freq to: "); Serial.println(RF95_FREQ);
+  Serial.print("Set Freq to: "); Serial.println(LORA_FREQ);
 
   // Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on
 
   // The default transmitter power is 13dBm, using PA_BOOST.
   // Set transmitter powers to 23 dBm:
-  rf95.setTxPower(23, false); // how high can this go? -Patrick
+  lora.setTxPower(23, false); // how high can this go? -Patrick
 
   // Indicate successful init
   digitalWrite(GREEN, LOW);
@@ -96,17 +101,17 @@ void loop()
    **/
   // Define recv buffers
   uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
-  uint8_t len = sizeof(buf);            // Just use RH_RF95_MAX_MESSAGE_LEN -Rachel
+  //uint8_t len = sizeof(buf);            // Just use RH_RF95_MAX_MESSAGE_LEN -Rachel
 
   // Wait for data from the flight computer
-  while (!rf95.available())
+  while (!lora.available())
   {
-//    Serial.println("no data received");
-//     signal no data received
+  //    Serial.println("no data received");
+  //     signal no data received
     digitalWrite(RED, HIGH);
     digitalWrite(GREEN, LOW);
   }
-  if (rf95.recv(buf, &len)) // Don't pass by reference, just use RH_RF95_MAX_MESSAGE_LEN -Rachel
+  if (lora.recv(buf, RH_RF95_MAX_MESSAGE_LEN)) // Don't pass by reference, just use RH_RF95_MAX_MESSAGE_LEN -Rachel
   {
     // Get rid of printlns; GUI works -Rachel
     Serial.println("");
@@ -121,14 +126,14 @@ void loop()
     String str((char*)buf);
 
     // Validate header
-    if (!str.substring(0,4).equals("HEYY"))
+    if (!str.substring(0,4).equals(flight_header))
     {
       Serial.println("FATAL! BAD HEADER");
       // indicate bad header
       digitalWrite(RED, HIGH);
       digitalWrite(GREEN, HIGH);
       delay(1000);
-      return; // break out of loop function // how does this behave???? -rachel
+      return; // break out of loop function // how does this behave???? -rachel // behaves as expected - patrick
     }
     else
     {
@@ -153,19 +158,19 @@ void loop()
      **/
 
     // Define response buffer
-    char packet[20] = ""; // move packet definition out of loop(), define 20 as constant
+    char packet[PACKET_SIZE] = ""; // move packet definition out of loop(), define 20 as constant
     strcat(packet, header); // Add header
     strcat(packet, " CMD other stuff"); // Add dummy command
-    packet[19] = '\0'; // Null terminate // use constant -rachel
+    packet[PACKET_SIZE] = '\0'; // Null terminate // use constant -rachel
     Serial.print("SENDING PACKET... ");
     //Serial.println((char*)packet);
-    rf95.send((uint8_t*)packet, 20); // TODO change the 20 to sizeof(packet) // use constant -rachel
-    rf95.waitPacketSent(); // Wait until finished sending
+    lora.send((uint8_t*)packet, PACKET_SIZE); // TODO change the 20 to sizeof(packet) // use constant -rachel
+    lora.waitPacketSent(); // Wait until finished sending
     Serial.println("DONE!");
 
     // Report RSSI
     Serial.print("RSSI: ");
-    Serial.println(rf95.lastRssi());
+    Serial.println(lora.lastRssi());
     Serial.println("<----------  END TRANSMISSION  ---------->");
 
     delay(100); 
