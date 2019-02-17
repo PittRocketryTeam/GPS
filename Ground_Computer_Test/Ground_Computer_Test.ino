@@ -11,8 +11,13 @@
 
 #define PACKET_SIZE 20
 
-const char header[5] = "U_UP";  // make this constant -rachel // done
+/*const char header[5] = "U_UP";  // make this constant -rachel // done
 const char flight_header[5] = "HEYY";
+char packet[PACKET_SIZE];*/
+
+String packet = "";
+const String header = "U_UP";
+const String flight_header = "HEYY";
 // add define for flight header - rachel
 
 #define LORA_FREQ 433.0 // Change 'RFM95' to 'LoRa' - Rachel // done - patrick
@@ -102,6 +107,7 @@ void loop()
   // Define recv buffers
   uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
   //uint8_t len = sizeof(buf);            // Just use RH_RF95_MAX_MESSAGE_LEN -Rachel
+  uint8_t len = RH_RF95_MAX_MESSAGE_LEN;
 
   // Wait for data from the flight computer
   while (!lora.available())
@@ -111,7 +117,8 @@ void loop()
     digitalWrite(RED, HIGH);
     digitalWrite(GREEN, LOW);
   }
-  if (lora.recv(buf, RH_RF95_MAX_MESSAGE_LEN)) // Don't pass by reference, just use RH_RF95_MAX_MESSAGE_LEN -Rachel
+  
+  if (lora.recv(buf, &len)) // Don't pass by reference, just use RH_RF95_MAX_MESSAGE_LEN -Rachel // turns out, the code on github is different len tells the lora how much to receive
   {
     // Get rid of printlns; GUI works -Rachel
     Serial.println("");
@@ -147,7 +154,7 @@ void loop()
       Serial.println("PACKET CONTAINS NMEA DATA");
     }
 
-    delay(500); // Breathing room for the flight computer
+    delay(100); // Breathing room for the flight computer  // fails without this delay
 
     /**
      * Instead of redefining the buffers every cycle, I'd rather
@@ -158,13 +165,17 @@ void loop()
      **/
 
     // Define response buffer
-    char packet[PACKET_SIZE] = ""; // move packet definition out of loop(), define 20 as constant
-    strcat(packet, header); // Add header
-    strcat(packet, " CMD other stuff"); // Add dummy command
-    packet[PACKET_SIZE] = '\0'; // Null terminate // use constant -rachel
+    //char packet[PACKET_SIZE] = ""; // move packet definition out of loop(), define 20 as constant
+    //packet[0] = '\0'; // "clear" the buffer
+    //strcat(packet, header); // Add header
+    //strcat(packet, " CMD other stuff"); // Add dummy command
+    //packet[PACKET_SIZE-1] = '\0'; // Null terminate // use constant -rachel
+    packet = "";
+    packet.concat(header);
+    packet.concat("CMD other stuff");
     Serial.print("SENDING PACKET... ");
     //Serial.println((char*)packet);
-    lora.send((uint8_t*)packet, PACKET_SIZE); // TODO change the 20 to sizeof(packet) // use constant -rachel
+    lora.send((uint8_t*)packet.c_str(), PACKET_SIZE); // TODO change the 20 to sizeof(packet) // use constant -rachel
     lora.waitPacketSent(); // Wait until finished sending
     Serial.println("DONE!");
 
@@ -173,6 +184,6 @@ void loop()
     Serial.println(lora.lastRssi());
     Serial.println("<----------  END TRANSMISSION  ---------->");
 
-    delay(100); 
+    //delay(100); 
   }
 }
