@@ -1,6 +1,11 @@
 //#include <SPI.h> // patrick - tentatively remove // done
 #include <RH_RF95.h>
 
+// temporary pin values for the debug leds on the pcb
+#define DEBUG_0 0
+#define DEBUG_1 0
+#define DEBUG_2 0
+
 #define RFM95_CS 4 // Change 'RFM95' to 'LoRa' - Rachel
 #define RFM95_RST 2
 #define RFM95_INT 3
@@ -23,6 +28,16 @@ const String flight_header = "HEYY";
 #define LORA_FREQ 433.0 // Change 'RFM95' to 'LoRa' - Rachel // done - patrick
 
 RH_RF95 lora(RFM95_CS, RFM95_INT); // Change 'RFM95' to 'LoRa' - Rachel // done - patrick
+
+void encodeErrorMsg(uint8_t code)
+{
+    // the state of the debug leds corresponds to the binary bits set to 1 in the error code argument
+    // eg. code = 5 -> 0b00000101 in binary
+    // the 3 debug leds would display ON OFF ON, or 5 in binary
+    digitalWrite(DEBUG_0, (code >> 0) & 1); // first led (rightmost)
+    digitalWrite(DEBUG_1, (code >> 1) & 1); // second led
+    digitalWrite(DEBUG_2, (code >> 2) & 1); // third led (leftmost)
+}
 
 void blinkLed(int pin, int blinks, int duration)
 {
@@ -56,7 +71,7 @@ void setup()
   pinMode(RFM95_RST, OUTPUT);
   digitalWrite(RFM95_RST, HIGH);
 
-  //Serial.println("Arduino LoRa TX Test!"); // go away -rachel // done - 
+  //Serial.println("Arduino LoRa TX Test!"); // go away -rachel // done -
 
   // Manually reset the LoRa module
   digitalWrite(RFM95_RST, LOW);
@@ -117,7 +132,7 @@ void loop()
     digitalWrite(RED, HIGH);
     digitalWrite(GREEN, LOW);
   }
-  
+
   if (lora.recv(buf, &len)) // Don't pass by reference, just use RH_RF95_MAX_MESSAGE_LEN -Rachel // turns out, the code on github is different len tells the lora how much to receive
   {
     // Get rid of printlns; GUI works -Rachel
@@ -184,6 +199,6 @@ void loop()
     Serial.println(lora.lastRssi());
     Serial.println("<----------  END TRANSMISSION  ---------->");
 
-    //delay(100); 
+    //delay(100);
   }
 }
