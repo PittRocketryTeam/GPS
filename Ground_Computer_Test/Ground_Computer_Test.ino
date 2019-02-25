@@ -2,13 +2,44 @@
 #include <RH_RF95.h>
 
 // temporary pin values for the debug leds on the pcb
-#define DEBUG_0 0
-#define DEBUG_1 0
-#define DEBUG_2 0
+/*#define DEBUG_TX 12
+#define DEBUG_RX 11
+#define DEBUG_OK 10
+#define DEBUG_ER 9
+#define MODE_TX 0
+#define MODE_RX 1
+#define MODE_IN 2
+#define STATUS_OK 0
+#define STATUS_ER 1
 
-#define RFM95_CS 4 // Change 'RFM95' to 'LoRa' - Rachel
-#define RFM95_RST 2
-#define RFM95_INT 3
+void debug_init()
+{
+  pinMode(DEBUG_TX, OUTPUT);
+  pinMode(DEBUG_RX, OUTPUT);
+  pinMode(DEBUG_ER, OUTPUT);
+  pinMode(DEBUG_OK, OUTPUT);
+}
+
+void debug_setmode(uint8_t mode)
+{
+  if (mode > 1)
+  {
+    digitalWrite(DEBUG_TX, HIGH);
+    digitalWrite(DEBUG_RX, HIGH);
+  }
+  digitalWrite(DEBUG_TX, !mode);
+  digitalWrite(DEBUG_RX, mode);
+}
+
+void debug_setstatus(uint8_t stat)
+{
+  digitalWrite(DEBUG_ER, !stat);
+  digitalWrite(DEBUG_ER, stat);
+}*/
+
+#define LORA_CS 4 // Change 'RFM95' to 'LoRa' - Rachel
+#define LORA_RST 2
+#define LORA_INT 3
 
 //#define TLED 8    // remove -rachel // done
 #define GREEN 24
@@ -27,9 +58,9 @@ const String flight_header = "HEYY";
 
 #define LORA_FREQ 433.0 // Change 'RFM95' to 'LoRa' - Rachel // done - patrick
 
-RH_RF95 lora(RFM95_CS, RFM95_INT); // Change 'RFM95' to 'LoRa' - Rachel // done - patrick
+RH_RF95 lora(LORA_CS, LORA_INT); // Change 'RFM95' to 'LoRa' - Rachel // done - patrick
 
-void encodeErrorMsg(uint8_t code)
+/*void encodeErrorMsg(uint8_t code)
 {
     // the state of the debug leds corresponds to the binary bits set to 1 in the error code argument
     // eg. code = 5 -> 0b00000101 in binary
@@ -37,12 +68,19 @@ void encodeErrorMsg(uint8_t code)
     digitalWrite(DEBUG_0, (code >> 0) & 1); // first led (rightmost)
     digitalWrite(DEBUG_1, (code >> 1) & 1); // second led
     digitalWrite(DEBUG_2, (code >> 2) & 1); // third led (leftmost)
-}
+}*/
 
 void blinkLed(int pin, int blinks, int duration)
 {
-  if (blinks <= 0) return;
-  if (duration <= 0) return;
+  if (blinks <= 0)
+  {
+      return;
+  }
+
+  if (duration <= 0)
+  {
+      return;
+  }
 
   for (int i=0; i<blinks; i++)
   {
@@ -55,37 +93,41 @@ void blinkLed(int pin, int blinks, int duration)
 
 void setup()
 {
+  //debug_init();
+  //debug_setmode(MODE_IN);
+
   // Init debug LEDs
   pinMode(GREEN, OUTPUT);
   pinMode(RED, OUTPUT);
+
+  digitalWrite(GREEN, HIGH);
+  digitalWrite(RED, HIGH);
+  delay(1000);
 
   // Start serial communications
   Serial.begin(9600);
   delay(100);
 
-  // Signal init start
-  digitalWrite(GREEN, HIGH);
-  digitalWrite(RED, HIGH);
-
   // Init LoRa reset pin
-  pinMode(RFM95_RST, OUTPUT);
-  digitalWrite(RFM95_RST, HIGH);
-
-  //Serial.println("Arduino LoRa TX Test!"); // go away -rachel // done -
+  pinMode(LORA_RST, OUTPUT);
+  digitalWrite(LORA_RST, HIGH);
 
   // Manually reset the LoRa module
-  digitalWrite(RFM95_RST, LOW);
+  digitalWrite(LORA_RST, LOW);
   delay(10);
-  digitalWrite(RFM95_RST, HIGH);
+  digitalWrite(LORA_RST, HIGH);
   delay(10);
 
   // Wait for LoRa module to be ready
   while (!lora.init())
   {
+    //debug_setstatus(STATUS_ER);
     Serial.println("LoRa radio init failed");
+    blinkLed(RED, 5, 200);
     //while (1); // hang  // Add delay before trying to reinit -Rachel
-    delay(100);
+    delay(1000);
   }
+  //debug_setstatus(STATUS_OK);
   Serial.println("LoRa radio init OK!");
 
   // Set frequency
@@ -96,7 +138,9 @@ void setup()
     Serial.println("setFrequency failed");
     //while (1); // hang  // Add delay before trying to reinit -Rachel
     delay(1000);
+    //debug_setstatus(STATUS_ER);
   }
+  //debug_setstatus(STATUS_OK);
   Serial.print("Set Freq to: "); Serial.println(LORA_FREQ);
 
   // Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on
@@ -108,32 +152,27 @@ void setup()
   // Indicate successful init
   digitalWrite(GREEN, LOW);
   digitalWrite(RED, LOW);
+  delay(1000);
 }
 
 void loop()
 {
-  /**
-   * Instead of redefining the buffers every cycle, I'd rather
-   * define the buffers once, and then call either
-   * memset(buf, 0, sizeof(buf)); or set the first index of the array
-   * to '\0' (null terminator)
-   * every cycle.
-   **/
   // Define recv buffers
   uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
-  //uint8_t len = sizeof(buf);            // Just use RH_RF95_MAX_MESSAGE_LEN -Rachel
   uint8_t len = RH_RF95_MAX_MESSAGE_LEN;
 
   // Wait for data from the flight computer
+  Serial.println("wait");
   while (!lora.available())
   {
   //    Serial.println("no data received");
   //     signal no data received
-    digitalWrite(RED, HIGH);
+    //digitalWrite(RED, HIGH);
+    blinkLed(RED, 1, 100);
     digitalWrite(GREEN, LOW);
   }
 
-  if (lora.recv(buf, &len)) // Don't pass by reference, just use RH_RF95_MAX_MESSAGE_LEN -Rachel // turns out, the code on github is different len tells the lora how much to receive
+  if (lora.recv(buf, &len))
   {
     // Get rid of printlns; GUI works -Rachel
     Serial.println("");
@@ -152,8 +191,7 @@ void loop()
     {
       Serial.println("FATAL! BAD HEADER");
       // indicate bad header
-      digitalWrite(RED, HIGH);
-      digitalWrite(GREEN, HIGH);
+      blinkLed(RED, 2, 300);
       delay(1000);
       return; // break out of loop function // how does this behave???? -rachel // behaves as expected - patrick
     }
