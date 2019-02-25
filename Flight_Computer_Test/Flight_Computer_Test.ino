@@ -12,21 +12,21 @@
 
 // TODO: Fix this to set conditionally based on UUID -- Rachel
 // Flight Configuration
-//#define RFM95_CS  9 // Change 'RFM95' to 'LoRa' - Rachel
-//#define RFM95_RST 24
-//#define RFM95_INT 5
-//#define GPS_TX 0
-//#define GPS_RX 1
-//#define RF95_FREQ 433.0
+#define RFM95_CS  9 // Change 'RFM95' to 'LoRa' - Rachel
+#define RFM95_RST 24
+#define RFM95_INT 5
+#define GPS_TX 0
+#define GPS_RX 1
+#define RF95_FREQ 433.0
 
 
 // Prototype Configuration
-#define RFM95_CS  4
-#define RFM95_RST 2
-#define RFM95_INT 3
-#define GPS_TX 7
-#define GPS_RX 8
-#define RF95_FREQ 433.0
+//#define RFM95_CS  4
+//#define RFM95_RST 2
+//#define RFM95_INT 3
+//#define GPS_TX 7
+//#define GPS_RX 8
+//#define RF95_FREQ 433.0
 //RH_RF95 rf95(RFM95_CS, RFM95_INT);// radio driver
 RH_RF95 rf95(RFM95_CS, RFM95_INT);// radio driver
 // Reorganize define statements -Rachel
