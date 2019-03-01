@@ -189,11 +189,31 @@ void loop()
         {
           Serial.println("RECEIVED RELEASE COMMAND");
           stepper.rotate(70000);  // deploy rover
+
+
+          //Added confirmation to prevent ground control from incorrectly assuming rover is released
+          String reply="";
+          while (!(reply.substring(0,13).equals("U_UPCONFIRMED")))
+          {
+            reply = send_and_listen("RELEASED");
+          }
+
+          
         }
         if (str.substring(0,18).equals("U_UPCMDLOADPAYLOAD"))
         {
           Serial.println("RECEIVED LOAD PAYLOAD COMMAND");
           stepper.rotate(-54000);  // deploy rover
+
+
+          //Added confirmation to prevent ground control from incorrectly assuming rover loaded
+          String reply="";
+          while (!(reply.substring(0,13).equals("U_UPCONFIRMED")))
+          {
+            reply = send_and_listen("DEPLOYED");
+          }
+
+          
         }
         
       }
