@@ -270,15 +270,14 @@ void loop()
     {
       Serial.println("PACKET CONTAINS NMEA DATA");
     }
-    else if (str.substring(4).startsWith("LOADED"))
+    else if (str.substring(4).startsWith("LOADED") | str.substring(4).startsWith("RELEASED"))
     {
-      Serial.println("LOAD CONFIRMED");
-      send_and_listen("CONFIRMED");
-    }
-    else if (str.substring(4).startsWith("RELEASED"))
-    {
-      Serial.println("RELEASE CONFIRMED");
-      send_and_listen("CONFIRMED");
+      String reply = " ";
+      while (!(reply.substring(4).startsWith("$GPGGA")))
+      {
+          reply = send_and_listen("CONFIRMED");
+      }
+      Serial.println("EXECUTION CONFIRMED");
     }
 
     delay(100); // Breathing room for the flight computer  // fails without this delay
