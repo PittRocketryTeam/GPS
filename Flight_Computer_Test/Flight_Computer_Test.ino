@@ -187,8 +187,13 @@ void loop()
 
         if (str.substring(0,14).equals("U_UPCMDRELEASE"))
         {
-          Serial.print("RECEIVED RELEASE COMMAND");
-          stepper.rotate(54000);  // deploy rover
+          Serial.println("RECEIVED RELEASE COMMAND");
+          stepper.rotate(70000);  // deploy rover
+        }
+        if (str.substring(0,18).equals("U_UPCMDLOADPAYLOAD"))
+        {
+          Serial.println("RECEIVED LOAD PAYLOAD COMMAND");
+          stepper.rotate(-54000);  // deploy rover
         }
         
       }
