@@ -223,9 +223,14 @@ void loop()
     //strcat(packet, header); // Add header
     //strcat(packet, " CMD other stuff"); // Add dummy command
     //packet[PACKET_SIZE-1] = '\0'; // Null terminate // use constant -rachel
+    String cmd = "";
+    while (Serial.available())
+    {
+      cmd.concat((char)Serial.read());
+    }
     packet = "";
     packet.concat(header);
-    packet.concat("CMD other stuff");
+    packet.concat(cmd);
     Serial.print("SENDING PACKET... ");
     //Serial.println((char*)packet);
     lora.send((uint8_t*)packet.c_str(), PACKET_SIZE); // TODO change the 20 to sizeof(packet) // use constant -rachel
