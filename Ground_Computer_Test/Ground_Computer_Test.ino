@@ -117,7 +117,7 @@ String send_and_listen(String data)
   String packet = "";
   packet.concat(header);
   packet.concat(data);
-
+  
   lora.send((uint8_t*)packet.c_str(), PACKET_SIZE);
   lora.waitPacketSent();
 
@@ -269,6 +269,16 @@ void loop()
     if (str.substring(4).startsWith("$GPGGA"))  // move this to inside valid header loop -rachel
     {
       Serial.println("PACKET CONTAINS NMEA DATA");
+    }
+    else if (str.substring(4).startsWith("LOADED"))
+    {
+      Serial.println("LOAD CONFIRMED");
+      send_and_listen("CONFIRMED");
+    }
+    else if (str.substring(4).startsWith("RELEASED"))
+    {
+      Serial.println("RELEASE CONFIRMED");
+      send_and_listen("CONFIRMED");
     }
 
     delay(100); // Breathing room for the flight computer  // fails without this delay
