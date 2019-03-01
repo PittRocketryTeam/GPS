@@ -4,6 +4,9 @@
 #include <RH_RF95.h>
 #include <SoftwareSerial.h>
 #include <TeensyID.h>
+#include <Arduino.h>
+#include "BasicStepperDriver.h"
+
 
 // PCB UUID = 4e453614-8016-4000-8016-04e9e507f491
 // Prototype UUID = 4e453614-8016-4000-8020-04e9e507f41f
@@ -11,6 +14,13 @@
 //const char* UUID = teensyUUID();
 
 // TODO: Fix this to set conditionally based on UUID -- Rachel
+
+#define MOTOR_STEPS 1800
+#define RPM 80
+#define MICROSTEPS 1
+#define DIR 32
+#define STEP 31
+
 // Flight Configuration
 #define RFM95_CS  9 // Change 'RFM95' to 'LoRa' - Rachel
 #define RFM95_RST 24
@@ -19,7 +29,6 @@
 #define GPS_RX 1
 #define RF95_FREQ 433.0
 
-
 // Prototype Configuration
 //#define RFM95_CS  4
 //#define RFM95_RST 2
@@ -27,19 +36,20 @@
 //#define GPS_TX 7
 //#define GPS_RX 8
 //#define RF95_FREQ 433.0
-//RH_RF95 rf95(RFM95_CS, RFM95_INT);// radio driver
+
+BasicStepperDriver stepper(MOTOR_STEPS, DIR, STEP);
 RH_RF95 rf95(RFM95_CS, RFM95_INT);// radio driver
-// Reorganize define statements -Rachel
+
 #define PACKET_SIZE 86
-//char packet[PACKET_SIZE];
-//char VEHICLE_HEADER[4] = {'H','E','Y','Y'}; // make this constant -Rachel
-// ^ make this a string literal -Patrick
+
 String packet;
 const String header = "HEYY";
-const String gs_header = "U_UP";    // make this constant -Rachel
-String gpsBuffer;           // Move to above loop() -Rachel
-char byteIn;              // Move to above loop() -Rachel
-bool transmitReady;// Move to above loop() -Rachel
+const String gs_header = "U_UP";    
+String gpsBuffer;           
+char byteIn;             
+bool transmitReady;
+
+int greenPin = 8;
 
 // gps serial
 SoftwareSerial GPS(GPS_TX, GPS_RX);
@@ -86,6 +96,10 @@ String send_and_listen(String message)
 
 void setup()
 {
+  stepper.begin(RPM, MICROSTEPS);
+
+  pinMode(greenPin, OUTPUT);
+  digitalWrite(greenPin, LOW);
   // initialize pins
   pinMode(RFM95_RST, OUTPUT);
   digitalWrite(RFM95_RST, HIGH); //turning on LoRa
@@ -146,9 +160,11 @@ void loop()
   Serial.println(GPS.available());
    // Move transmitReady = false to here -Rachel
 
+
   // GPS Reading
   while (GPS.available())
   {
+    digitalWrite(greenPin, HIGH);
     byteIn = GPS.read();        // read 1 byte
     gpsBuffer += char(byteIn);  // add byte to buffer // fix casting syntax -Rachel
     if (byteIn == '\n')         // end of line
@@ -163,90 +179,18 @@ void loop()
     if (gpsBuffer.startsWith("$GPGGA")) // only transmit what's needed
     //if (1)
     {
-      // Populate packet with header and GPS payload
-      // Copying information from the buffer into a char array
-      // Consider copying GPS data straight into char array to eliminate these two lines -Rachel
-      //char payload[PACKET_SIZE - sizeof(VEHICLE_HEADER)];// Address this by defining value as a constant -Rachel
-      //gpsBuffer.toCharArray(payload, PACKET_SIZE - sizeof(VEHICLE_HEADER)); // copy gps data to packet
-
-      //packet[PACKET_SIZE - 1] = 0; // null terminate the packet
-
-      // Copy in vehicle header
-      // Use strcat here -Rachel
-      // BRACES!!!!!1! -Patrick
-      //for (int i = 0; i < sizeof(VEHICLE_HEADER); i++)
-      //  packet[i] = VEHICLE_HEADER[i];
-
-      // Copying info being transmitted into final transmittion packet
-      // Fix this with function to copy in payload/content -Rachel
-      //for (int i = sizeof(VEHICLE_HEADER); i < PACKET_SIZE; i++)
-      //  packet[i] = payload[i - sizeof(VEHICLE_HEADER)];
-
-      //packet = "";
-      //packet.concat(header);
-      //packet.concat(gpsBuffer);
-
-      // cast pointer to unsigned character and send
-      //rf95.send((uint8_t*)packet.c_str(), PACKET_SIZE);
-      // wait for send to finish
-      //rf95.waitPacketSent();
-
-      // check for a response
-      //uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
-      //uint8_t len = sizeof(buf);          // Just use RH_RF95_MAX_MESSAGE_LEN -Rachel
-      //Serial.println("Waiting for reply...");
-      //delay(10);
-      //if (rf95.waitAvailableTimeout(1000))
-      //{
-      //  // Should be a reply message for us now. If something in the buffer, proceed
-      //  if (rf95.recv(buf, &len)) // Don't pass by reference, just use RH_RF95_MAX_MESSAGE_LEN -Rachel
-      //  {
-      //    Serial.println("Received something, checking header...");
-      //    String str((char*)buf);
-
-      //    // Message has valid header
-      //    if (str.substring(0,4).equals(gs_header))
-      //    {
-      //      Serial.print("Valid header. Got reply: ");
-      //      Serial.println((char*)buf);
-      //     if (str.substring(5,8).equals("CMD"))
-      //      {
-      //        Serial.println("Received a command");
-      //        if (str.substring(9,15).equals("RELEASE"))
-      //        {
-      //          // Stepper motor code goes here -Rachel
-      //        }
-      //      }
-      //    }
-      //    else
-      //    {
-      //      Serial.println("Error: Message has invalid header.");
-      //    }
-      //    Serial.print("RSSI: ");
-      //    Serial.println(rf95.lastRssi(), DEC);
-      //  }
-      //  else
-      //  {
-      //    Serial.println("Receive failed");
-      //  }
-      //}
-      //else
-      //{
-      //  Serial.println("No reply, is there a listener around?");
-      //}
       String str = send_and_listen(gpsBuffer);
       if (str.substring(0,4).equals(gs_header))
       {
         Serial.print("Valid header. Got reply: ");
         Serial.println((char*)str.c_str());
-        if (str.substring(5,8).equals("CMD"))
+
+        if (str.substring(0,14).equals("U_UPCMDRELEASE"))
         {
-          Serial.println("Received a command");
-          if (str.substring(9,15).equals("RELEASE"))
-          {
-            // Stepper motor code goes here -Rachel
-          }
+          Serial.print("RECEIVED RELEASE COMMAND");
+          stepper.rotate(54000);  // deploy rover
         }
+        
       }
       else
       {
@@ -259,58 +203,7 @@ void loop()
     {
       Serial.println("GPS: no GPGGA header");
       String str = send_and_listen("NONE");
-      /*packet = "";
-      packet.concat(header);
-      packet.concat("NONE");
-
-      // cast pointer to unsigned character and send
-      rf95.send((uint8_t*)packet.c_str(), PACKET_SIZE);
-
-      // wait for send to finish
-      rf95.waitPacketSent();
-
-      uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
-      uint8_t len = sizeof(buf);          // Just use RH_RF95_MAX_MESSAGE_LEN -Rachel
-      Serial.println("Waiting for reply...");
-      delay(10);
-      if (rf95.waitAvailableTimeout(1000))
-      {
-        // Should be a reply message for us now. If something in the buffer, proceed
-        if (rf95.recv(buf, &len)) // Don't pass by reference, just use RH_RF95_MAX_MESSAGE_LEN -Rachel
-        {
-          Serial.println("Received something, checking header...");
-          String str((char*)buf);
-
-          // Message has valid header
-          if (str.substring(0,4).equals(gs_header))
-          {
-            Serial.print("Valid header. Got reply: ");
-            Serial.println((char*)buf);
-            if (str.substring(5,8).equals("CMD"))
-            {
-              Serial.println("Received a command");
-              if (str.substring(9,15).equals("RELEASE"))
-              {
-                // Stepper motor code goes here -Rachel
-              }
-            }
-          }
-          else
-          {
-            Serial.println("Error: Message has invalid header.");
-          }
-          Serial.print("RSSI: ");
-          Serial.println(rf95.lastRssi(), DEC);
-        }
-        else
-        {
-          Serial.println("Receive failed");
-        }
-      }
-      else
-      {
-        Serial.println("No reply, is there a listener around?");
-      }*/
+      
     }
 
     delay(1000); // breathing room
