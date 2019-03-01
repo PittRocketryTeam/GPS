@@ -82,12 +82,12 @@ String send_and_listen(String message)
     }
     else
     {
-      out = "err_noreply";
+      out = "ERR_NO_REPLY";
     }
   }
   else
   {
-    out = "err_noreply";
+    out = "ERR_NO_REPLY";
   }
 
   return out;
