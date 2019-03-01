@@ -3,7 +3,7 @@
 #include <SPI.h> // patrick - tentatively remove
 #include <RH_RF95.h>
 #include <SoftwareSerial.h>
-#include <TeensyID.h>
+//#include <TeensyID.h>
 #include <Arduino.h>
 #include "BasicStepperDriver.h"
 
@@ -192,7 +192,7 @@ void loop()
 
 
           //Added confirmation to prevent ground control from incorrectly assuming rover is released
-          String reply="";
+          String reply=" ";
           while (!(reply.substring(0,13).equals("U_UPCONFIRMED")))
           {
             reply = send_and_listen("RELEASED");
@@ -205,14 +205,12 @@ void loop()
           Serial.println("RECEIVED LOAD PAYLOAD COMMAND");
           stepper.rotate(-54000);  // deploy rover
 
-
           //Added confirmation to prevent ground control from incorrectly assuming rover loaded
-          String reply="";
+         String reply= " ";
           while (!(reply.substring(0,13).equals("U_UPCONFIRMED")))
           {
             reply = send_and_listen("DEPLOYED");
           }
-
           
         }
         
