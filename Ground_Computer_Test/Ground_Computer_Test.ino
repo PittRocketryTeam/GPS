@@ -1,6 +1,8 @@
 //#include <SPI.h> // patrick - tentatively remove // done
 #include <RH_RF95.h>
 
+#define TIMEOUT 1000
+
 // temporary pin values for the debug leds on the pcb
 /*#define DEBUG_TX 12
 #define DEBUG_RX 11
@@ -91,6 +93,67 @@ void blinkLed(int pin, int blinks, int duration)
   }
 }
 
+String recv_packet()
+{
+  String out;
+  uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
+  uint8_t len = RH_RF95_MAX_MESSAGE_LEN;
+
+  if (lora.recv(buf, &len))
+  {
+    out = String((char*)buf);
+  }
+  else
+  {
+    out = "";
+  }
+
+  return out;
+}
+
+String send_and_listen(String data)
+{
+  String out;
+  String packet = "";
+  packet.concat(header);
+  packet.concat(data);
+
+  lora.send((uint8_t*)packet.c_str(), PACKET_SIZE);
+  lora.waitPacketSent();
+
+  uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
+  uint8_t len = RH_RF95_MAX_MESSAGE_LEN;
+
+  if (lora.waitAvailableTimeout(TIMEOUT))
+  {
+    if (lora.recv(buf, &len))
+    {
+      out = String((char*)buf);
+    }
+    else
+    {
+      out = "ERR_NO_REPLY";
+    }
+  }
+  else
+  {
+    out = "ERR_NO_REPLY";
+  }
+
+  return out;
+}
+
+String get_command()
+{
+  String cmd = "";
+  while (Serial.available())
+  {
+    cmd.concat((char)Serial.read());
+  }
+
+  return cmd;
+}
+
 void setup()
 {
   //debug_init();
@@ -172,7 +235,8 @@ void loop()
     digitalWrite(GREEN, LOW);
   }
 
-  if (lora.recv(buf, &len))
+  String str = recv_packet();
+  if (str != "")
   {
     // Get rid of printlns; GUI works -Rachel
     Serial.println("");
@@ -181,10 +245,10 @@ void loop()
     digitalWrite(RED, LOW);
     digitalWrite(GREEN, HIGH);
     Serial.print("GOT REPLY: ");
-    Serial.println((char*)buf);
+    Serial.println(str);
 
     // convert recv buffer into Arduino String
-    String str((char*)buf);
+    //String str((char*)buf);
 
     // Validate header
     if (!str.substring(0,4).equals(flight_header))
@@ -193,7 +257,7 @@ void loop()
       // indicate bad header
       blinkLed(RED, 2, 300);
       delay(1000);
-      return; // break out of loop function // how does this behave???? -rachel // behaves as expected - patrick
+      return;
     }
     else
     {
@@ -209,32 +273,8 @@ void loop()
 
     delay(100); // Breathing room for the flight computer  // fails without this delay
 
-    /**
-     * Instead of redefining the buffers every cycle, I'd rather
-     * define the buffers once, and then call either
-     * memset(packet, 0, sizeof(packet)); or set the first index of the array
-     * to '\0' (null terminator)
-     * every cycle.
-     **/
-
-    // Define response buffer
-    //char packet[PACKET_SIZE] = ""; // move packet definition out of loop(), define 20 as constant
-    //packet[0] = '\0'; // "clear" the buffer
-    //strcat(packet, header); // Add header
-    //strcat(packet, " CMD other stuff"); // Add dummy command
-    //packet[PACKET_SIZE-1] = '\0'; // Null terminate // use constant -rachel
-    String cmd = "";
-    while (Serial.available())
-    {
-      cmd.concat((char)Serial.read());
-    }
-    packet = "";
-    packet.concat(header);
-    packet.concat(cmd);
-    Serial.print("SENDING PACKET... ");
-    //Serial.println((char*)packet);
-    lora.send((uint8_t*)packet.c_str(), PACKET_SIZE); // TODO change the 20 to sizeof(packet) // use constant -rachel
-    lora.waitPacketSent(); // Wait until finished sending
+    String cmd = get_command();
+    send_and_listen(cmd);
     Serial.println("DONE!");
 
     // Report RSSI
