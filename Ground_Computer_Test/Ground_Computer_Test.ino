@@ -117,6 +117,9 @@ String send_and_listen(String data)
   String packet = "";
   packet.concat(header);
   packet.concat(data);
+
+  Serial.print("Sent: ");
+  Serial.println(packet);
   
   lora.send((uint8_t*)packet.c_str(), PACKET_SIZE);
   lora.waitPacketSent();
@@ -272,11 +275,6 @@ void loop()
     }
     else if (str.substring(4).startsWith("LOADED") | str.substring(4).startsWith("RELEASED"))
     {
-      String reply = " ";
-      while (!(reply.substring(4).startsWith("$GPGGA")))
-      {
-          reply = send_and_listen("CONFIRMED");
-      }
       Serial.println("EXECUTION CONFIRMED");
     }
 

@@ -22,20 +22,20 @@
 #define STEP 31
 
 // Flight Configuration
-#define RFM95_CS  9 // Change 'RFM95' to 'LoRa' - Rachel
+/*#define RFM95_CS  9 // Change 'RFM95' to 'LoRa' - Rachel
 #define RFM95_RST 24
 #define RFM95_INT 5
 #define GPS_TX 0
 #define GPS_RX 1
-#define RF95_FREQ 433.0
+#define RF95_FREQ 433.0*/
 
 // Prototype Configuration
-//#define RFM95_CS  4
-//#define RFM95_RST 2
-//#define RFM95_INT 3
-//#define GPS_TX 7
-//#define GPS_RX 8
-//#define RF95_FREQ 433.0
+#define RFM95_CS  4
+#define RFM95_RST 2
+#define RFM95_INT 3
+#define GPS_TX 7
+#define GPS_RX 8
+#define RF95_FREQ 433.0
 
 BasicStepperDriver stepper(MOTOR_STEPS, DIR, STEP);
 RH_RF95 rf95(RFM95_CS, RFM95_INT);// radio driver
@@ -188,32 +188,20 @@ void loop()
         if (str.substring(0,14).equals("U_UPCMDRELEASE"))
         {
           Serial.println("RECEIVED RELEASE COMMAND");
-          stepper.rotate(7000);  // deploy rover
+          stepper.rotate(70000);  // deploy rover
 
-
-          //Added confirmation to prevent ground control from incorrectly assuming rover is released
-          String reply=" ";
-          while (!(reply.substring(0,13).equals("U_UPCONFIRMED")))
-          {
-            reply = send_and_listen("RELEASED");
-          }
-
-          
+          send_and_listen("RELEASED");
+         
         }
         if (str.substring(0,18).equals("U_UPCMDLOADPAYLOAD"))
         {
           Serial.println("RECEIVED LOAD PAYLOAD COMMAND");
-          stepper.rotate(-5400);  // deploy rover
+          stepper.rotate(-54000);  // deploy rover
 
           //Added confirmation to prevent ground control from incorrectly assuming rover loaded
-         String reply= " ";
-          while (!(reply.substring(0,13).equals("U_UPCONFIRMED")))
-          {
-            reply = send_and_listen("LOADED");
-          }
-          
+          send_and_listen("LOADED");
         }
-        
+    
       }
       else
       {
